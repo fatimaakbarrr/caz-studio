@@ -57,7 +57,7 @@ body::after {
   padding: 0 48px;
   height: 64px;
   border-bottom: 1px solid var(--border);
-  background: rgba(250,248,244,0.92);
+  background: rgba(249,248,247,0.94);
   backdrop-filter: blur(16px);
   position: sticky; top: 0; z-index: 100;
 }
@@ -67,6 +67,7 @@ body::after {
   letter-spacing: 0.22em;
   color: var(--ink);
   text-transform: uppercase;
+  cursor: pointer;
 }
 .logo em { color: var(--accent); font-style: normal; }
 
@@ -88,18 +89,14 @@ body::after {
   padding: 11px 28px; border-radius: 2px;
   transition: all 0.22s;
 }
-.btn-dark {
-  background: var(--ink); color: var(--warm-white);
-}
+.btn-dark { background: var(--ink); color: var(--warm-white); }
 .btn-dark:hover { background: var(--charcoal); }
 .btn-outline {
   background: transparent; color: var(--ash);
   border: 1px solid var(--border-mid);
 }
 .btn-outline:hover { border-color: var(--ash); color: var(--ink); }
-.btn-accent {
-  background: var(--accent); color: var(--warm-white);
-}
+.btn-accent { background: var(--ink); color: var(--warm-white); }
 .btn-accent:hover { background: var(--charcoal); }
 .btn-ghost {
   background: transparent; color: var(--taupe);
@@ -121,11 +118,24 @@ body::after {
   color: var(--ink); letter-spacing: 0.02em;
   outline: none;
   transition: border-color 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .input:focus { border-color: var(--accent); }
 .input::placeholder { color: var(--stone); }
-.textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
-select.input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239B9088'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+.textarea { resize: vertical; min-height: 140px; line-height: 1.7; font-family: var(--mono); }
+
+/* FIX: custom select — kills browser blue highlight */
+select.input {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23928D88'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  background-color: var(--warm-white);
+}
+select.input:focus { outline: none; }
+select.input option { background: var(--warm-white); color: var(--ink); font-family: var(--mono); }
 
 .label {
   font-family: var(--mono); font-size: 10px;
@@ -157,58 +167,60 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 .lede {
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 0.28em; text-transform: uppercase;
-  color: var(--taupe); margin-bottom: 28px;
+  color: var(--taupe); margin-bottom: 32px;
   animation: rise 0.7s 0.05s both;
 }
 
+/* FIX: hero title line-height so "Think it." and "Write it." don't collide */
 .hero-title {
-  font-size: clamp(68px, 11vw, 136px);
-  font-weight: 300;
-  line-height: 0.92;
-  letter-spacing: -0.025em;
+  font-size: clamp(56px, 9vw, 112px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   color: var(--ink);
-  margin-bottom: 32px;
+  margin-bottom: 36px;
   animation: rise 0.7s 0.12s both;
 }
 .hero-title em {
   font-style: italic;
   color: var(--accent);
+  font-weight: 400;
 }
 
 .hero-sub {
-  font-size: 18px; font-weight: 300;
-  color: var(--taupe); line-height: 1.65;
-  max-width: 440px; margin: 0 auto 52px;
-  letter-spacing: 0.01em;
+  font-size: 17px; font-weight: 400;
+  color: var(--taupe); line-height: 1.7;
+  max-width: 420px; margin: 0 auto 52px;
   animation: rise 0.7s 0.2s both;
 }
 
 .hero-ctas {
   display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-  margin-bottom: 80px;
+  margin-bottom: 72px;
   animation: rise 0.7s 0.28s both;
 }
 
 .feature-row {
   display: flex; gap: 0;
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
   animation: rise 0.7s 0.36s both;
+  background: var(--warm-white);
 }
 .feature-cell {
-  padding: 20px 32px; flex: 1;
+  padding: 20px 28px; flex: 1;
   border-right: 1px solid var(--border);
   text-align: left;
 }
 .feature-cell:last-child { border-right: none; }
 .feature-cell-label {
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.16em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--stone); margin-bottom: 6px;
 }
 .feature-cell-val {
-  font-size: 16px; font-weight: 400; color: var(--charcoal);
+  font-size: 15px; font-weight: 400; color: var(--charcoal);
 }
 
 .landing-footer {
@@ -221,41 +233,46 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 }
 
 @keyframes rise {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 /* ─────────────────────────────────────
    AUTH
 ───────────────────────────────────── */
+/* FIX: auth screens use full flex column so header stays left-aligned */
 #screen-login, #screen-signup {
   background: var(--cream);
+}
+
+.auth-body {
+  flex: 1; display: flex;
   align-items: center; justify-content: center;
+  padding: 40px 20px;
 }
 
 .auth-container {
   width: 100%; max-width: 400px;
-  padding: 20px;
   animation: rise 0.5s both;
 }
 
 .auth-eyebrow {
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--stone); text-align: center; margin-bottom: 12px;
+  color: var(--stone); text-align: center; margin-bottom: 10px;
 }
 .auth-title {
-  font-size: 44px; font-weight: 300;
+  font-size: 40px; font-weight: 700;
   letter-spacing: -0.02em; text-align: center;
-  margin-bottom: 40px; color: var(--ink);
-  line-height: 1;
+  margin-bottom: 36px; color: var(--ink);
+  line-height: 1.1;
 }
-.auth-title em { font-style: italic; color: var(--accent); }
+.auth-title em { font-style: italic; color: var(--accent); font-weight: 400; }
 
 .auth-card {
   background: var(--warm-white);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 36px 32px;
 }
 
@@ -265,8 +282,8 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   font-family: var(--mono); font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--error);
-  background: rgba(139,74,74,0.07);
-  border: 1px solid rgba(139,74,74,0.2);
+  background: rgba(122,72,72,0.07);
+  border: 1px solid rgba(122,72,72,0.2);
   padding: 10px 14px; border-radius: 2px;
   display: none;
 }
@@ -304,6 +321,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   display: flex; flex-direction: column;
   position: sticky; top: 64px;
   height: calc(100vh - 64px);
+  overflow-y: auto;
 }
 
 .sidebar-section-label {
@@ -329,12 +347,12 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 .sidebar-credit-block {
   margin-top: auto;
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 20px;
   background: var(--warm-white);
 }
 .scb-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 6px; }
-.scb-num { font-size: 40px; font-weight: 300; color: var(--ink); line-height: 1; margin-bottom: 2px; letter-spacing: -0.02em; }
+.scb-num { font-size: 40px; font-weight: 400; color: var(--ink); line-height: 1; margin-bottom: 2px; letter-spacing: -0.02em; font-family: var(--serif); }
 .scb-sub { font-family: var(--mono); font-size: 10px; color: var(--stone); margin-bottom: 16px; }
 
 /* MAIN */
@@ -344,18 +362,10 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 .tab-panel { display: none; animation: rise 0.35s both; }
 .tab-panel.active { display: block; }
 
-.page-title { font-size: 40px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 4px; }
-.page-title em { font-style: italic; color: var(--accent); }
+/* FIX: page titles — only the em part is italic+accent, not the whole word */
+.page-title { font-size: 38px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; line-height: 1.1; }
+.page-title em { font-style: italic; color: var(--accent); font-weight: 400; }
 .page-sub { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--stone); text-transform: uppercase; margin-bottom: 40px; }
-
-/* CREDITS BADGE */
-.credits-pill {
-  font-family: var(--mono); font-size: 11px;
-  letter-spacing: 0.1em; color: var(--accent);
-  background: var(--accent-light);
-  border: 1px solid rgba(139,111,78,0.2);
-  padding: 5px 14px; border-radius: 20px;
-}
 
 /* ── STUDIO ── */
 .studio-grid {
@@ -369,7 +379,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   display: flex; border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
 }
 .mode-tab {
-  flex: 1; padding: 9px 0;
+  flex: 1; padding: 10px 0;
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--taupe); cursor: pointer; border: none;
@@ -390,7 +400,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   background: var(--cream);
   border: 1px solid var(--border);
   border-radius: 2px;
-  min-height: 300px;
+  min-height: 340px;
   padding: 24px;
   display: flex; flex-direction: column;
   position: relative; overflow: hidden;
@@ -401,18 +411,22 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   align-items: center; justify-content: center;
   gap: 10px;
 }
-.output-empty-mark { font-size: 32px; opacity: 0.18; letter-spacing: -0.05em; font-weight: 300; }
+.output-empty-mark {
+  font-family: var(--mono);
+  font-size: 13px; letter-spacing: 0.28em;
+  opacity: 0.2; text-transform: uppercase; font-weight: 400;
+}
 .output-empty-txt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone); }
 
 .output-text {
-  font-size: 15px; font-weight: 300;
-  line-height: 1.75; color: var(--charcoal);
+  font-size: 15px; font-weight: 400;
+  line-height: 1.8; color: var(--charcoal);
   white-space: pre-wrap; word-break: break-word;
   display: none; flex: 1;
   font-family: var(--serif);
 }
 .output-text.show { display: block; }
-.output-text.typing::after { content: '|'; opacity: 1; animation: blink-cur 0.75s step-end infinite; color: var(--accent); }
+.output-text.typing::after { content: '|'; animation: blink-cur 0.75s step-end infinite; color: var(--accent); }
 @keyframes blink-cur { 50% { opacity: 0; } }
 
 .output-footer {
@@ -420,8 +434,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   padding-top: 16px;
   margin-top: 16px;
   border-top: 1px solid var(--border);
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 8px; flex-wrap: wrap;
 }
 .output-footer.show { display: flex; }
 
@@ -439,7 +452,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 /* GENERATING OVERLAY */
 .gen-overlay {
   position: absolute; inset: 0;
-  background: rgba(240,235,225,0.96);
+  background: rgba(244,242,240,0.97);
   backdrop-filter: blur(3px);
   display: none; flex-direction: column;
   align-items: center; justify-content: center;
@@ -448,7 +461,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 .gen-overlay.show { display: flex; }
 
 .gen-line {
-  width: 120px; height: 1px;
+  width: 100px; height: 1px;
   background: var(--sand);
   position: relative; overflow: hidden;
 }
@@ -460,11 +473,10 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   animation: slide-line 1.4s ease-in-out infinite;
 }
 @keyframes slide-line { to { left: 200%; } }
-
 .gen-status { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--taupe); }
 
 /* ── STATS ── */
-.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
 @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
 
 .stat-tile {
@@ -473,37 +485,40 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   background: var(--warm-white);
 }
 .stat-tile-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); margin-bottom: 10px; }
-.stat-tile-val { font-size: 38px; font-weight: 300; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
+.stat-tile-val { font-size: 36px; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); line-height: 1; font-family: var(--serif); }
 .stat-tile-note { font-family: var(--mono); font-size: 10px; color: var(--success); margin-top: 6px; letter-spacing: 0.06em; }
 
 .usage-section {
   border: 1px solid var(--border); border-radius: 2px;
-  padding: 28px 28px; background: var(--warm-white);
+  padding: 28px; background: var(--warm-white);
 }
-.section-heading { font-size: 22px; font-weight: 300; letter-spacing: -0.01em; margin-bottom: 20px; }
-.usage-rows { display: flex; flex-direction: column; gap: 16px; }
+.section-heading { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 24px; }
+.section-heading em { font-style: italic; color: var(--accent); font-weight: 400; }
+.usage-rows { display: flex; flex-direction: column; gap: 18px; }
 .usage-row { display: flex; align-items: center; gap: 16px; }
 .usage-row-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--taupe); width: 60px; flex-shrink: 0; }
-.usage-track { flex: 1; height: 2px; background: var(--sand); border-radius: 1px; overflow: hidden; }
-.usage-fill { height: 100%; border-radius: 1px; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+.usage-track { flex: 1; height: 1px; background: var(--sand); overflow: hidden; }
+.usage-fill { height: 100%; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
 .usage-count { font-family: var(--mono); font-size: 11px; color: var(--stone); width: 24px; text-align: right; flex-shrink: 0; }
 
-/* ── HISTORY ── */
+/* ── HISTORY ── FIX: removed bullet point, uses styled dot */
 .history-rows { display: flex; flex-direction: column; }
 .history-row {
   display: flex; align-items: center; gap: 16px;
-  padding: 18px 0;
+  padding: 18px 8px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: background 0.15s;
+  border-radius: 2px;
+  list-style: none;
 }
 .history-row:first-child { border-top: 1px solid var(--border); }
-.history-row:hover { background: var(--accent-lighter); margin: 0 -8px; padding-left: 8px; padding-right: 8px; }
-.h-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.history-row:hover { background: var(--accent-lighter); }
+.h-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 .h-dot.copy { background: var(--accent); }
 .h-dot.code { background: var(--success); }
 .h-dot.story { background: var(--ash); }
-.h-prompt { flex: 1; font-size: 15px; font-weight: 300; color: var(--charcoal); }
+.h-prompt { flex: 1; font-size: 15px; font-weight: 400; color: var(--charcoal); }
 .h-meta { font-family: var(--mono); font-size: 10px; color: var(--stone); letter-spacing: 0.06em; white-space: nowrap; }
 .h-mode { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--taupe); width: 40px; text-align: right; flex-shrink: 0; }
 
@@ -515,7 +530,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 @media (max-width: 900px) { .pricing-row { grid-template-columns: 1fr; max-width: 380px; } }
 
 .plan {
-  border: 1px solid var(--border); border-radius: 3px;
+  border: 1px solid var(--border); border-radius: 2px;
   padding: 32px 28px; background: var(--warm-white);
   display: flex; flex-direction: column; gap: 24px;
   transition: border-color 0.2s, transform 0.2s;
@@ -530,21 +545,21 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
   font-family: var(--mono); font-size: 9px;
   letter-spacing: 0.16em; text-transform: uppercase;
   padding: 4px 12px;
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 2px 2px;
 }
 
 .plan-name-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); }
-.plan-amt { font-size: 52px; font-weight: 300; letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
+.plan-amt { font-size: 48px; font-weight: 400; letter-spacing: -0.02em; line-height: 1; color: var(--ink); font-family: var(--serif); }
 .plan-period { font-family: var(--mono); font-size: 10px; color: var(--stone); letter-spacing: 0.1em; margin-top: 4px; }
 .plan-credit-note { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.08em; }
 .plan-feats { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.plan-feat { font-size: 14px; font-weight: 300; color: var(--ash); display: flex; align-items: center; gap: 10px; }
-.plan-feat::before { content: '—'; color: var(--stone); font-weight: 300; }
+.plan-feat { font-size: 13px; font-weight: 400; color: var(--ash); display: flex; align-items: center; gap: 10px; font-family: var(--mono); letter-spacing: 0.02em; }
+.plan-feat::before { content: '—'; color: var(--stone); }
 
 /* ── STRIPE MODAL ── */
 .modal-bg {
   position: fixed; inset: 0;
-  background: rgba(28,26,24,0.55);
+  background: rgba(26,25,24,0.5);
   backdrop-filter: blur(6px);
   z-index: 500;
   display: none; align-items: center; justify-content: center;
@@ -554,7 +569,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 .modal-box {
   background: var(--warm-white);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 44px 40px;
   width: 100%; max-width: 440px;
   position: relative;
@@ -571,10 +586,10 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 .modal-close-btn:hover { color: var(--ink); border-color: var(--stone); }
 
 .modal-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px; }
-.modal-title { font-size: 30px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 28px; }
-.modal-title em { font-style: italic; color: var(--accent); }
+.modal-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 28px; line-height: 1.1; }
+.modal-title em { font-style: italic; color: var(--accent); font-weight: 400; }
 
-.stripe-badge { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--taupe); margin-bottom: 24px; border: 1px solid var(--border); padding: 8px 14px; border-radius: 2px; }
+.stripe-badge { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--taupe); margin-bottom: 24px; border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; }
 .stripe-form-fields { display: flex; flex-direction: column; gap: 16px; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .modal-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--stone); text-align: center; margin-top: 10px; }
@@ -595,13 +610,13 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 .toast-wrap.ok { background: var(--ink); }
 .toast-wrap.bad { background: var(--error); }
 
-/* ── HEADER EXTRAS ── */
+/* ── HEADER CREDITS ── */
 .header-credits {
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--taupe);
 }
-.header-credits strong { color: var(--accent); }
+.header-credits strong { color: var(--ink); font-weight: 400; }
 </style>
 </head>
 <body>
@@ -611,7 +626,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 ══════════════════════ -->
 <div id="screen-landing" class="screen active">
   <header class="header">
-    <div class="logo">C<em>A</em>Z</div>
+    <div class="logo" onclick="showScreen('landing')">C<em>A</em>Z</div>
     <nav class="nav-row">
       <button class="nav-link" onclick="showScreen('login')">Sign in</button>
       <button class="btn btn-dark btn-sm" onclick="showScreen('signup')">Get started</button>
@@ -666,9 +681,9 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 ══════════════════════ -->
 <div id="screen-login" class="screen">
   <header class="header">
-    <div class="logo" style="cursor:pointer" onclick="showScreen('landing')">C<em style="color:var(--accent);font-style:normal">A</em>Z</div>
+    <div class="logo" onclick="showScreen('landing')">C<em>A</em>Z</div>
   </header>
-  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:var(--cream)">
+  <div class="auth-body">
     <div class="auth-container">
       <div class="auth-eyebrow">Welcome back</div>
       <h2 class="auth-title">Sign <em>in</em></h2>
@@ -698,9 +713,9 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 ══════════════════════ -->
 <div id="screen-signup" class="screen">
   <header class="header">
-    <div class="logo" style="cursor:pointer" onclick="showScreen('landing')">C<em style="color:var(--accent);font-style:normal">A</em>Z</div>
+    <div class="logo" onclick="showScreen('landing')">C<em>A</em>Z</div>
   </header>
-  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:var(--cream)">
+  <div class="auth-body">
     <div class="auth-container">
       <div class="auth-eyebrow">50 free credits on sign-up</div>
       <h2 class="auth-title">Create <em>account</em></h2>
@@ -734,7 +749,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 ══════════════════════ -->
 <div id="screen-dashboard" class="screen">
   <header class="header">
-    <div class="logo">C<em style="color:var(--accent);font-style:normal">A</em>Z</div>
+    <div class="logo" onclick="showScreen('landing')">C<em>A</em>Z</div>
     <div style="display:flex;align-items:center;gap:24px">
       <div class="header-credits"><strong id="hdr-credits">50</strong> credits</div>
       <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--stone);text-transform:uppercase" id="hdr-user">user</span>
@@ -839,7 +854,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
         <div class="page-title"><em>History</em></div>
         <div class="page-sub">Your past generations</div>
         <div class="history-rows" id="history-rows">
-          <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);padding:32px 0;text-align:center">
+          <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);padding:40px 0;text-align:center">
             No generations yet
           </div>
         </div>
@@ -902,8 +917,8 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
 
       <!-- OVERVIEW -->
       <div class="tab-panel" id="tab-overview">
-        <div class="page-title"><em>Overview</em></div>
-        <div class="page-sub">Your usage this session</div>
+        <div class="page-title">Your <em>Overview</em></div>
+        <div class="page-sub">Usage this session</div>
         <div class="stat-grid">
           <div class="stat-tile">
             <div class="stat-tile-label">Credits left</div>
@@ -928,7 +943,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
         </div>
 
         <div class="usage-section">
-          <div class="section-heading">Usage by <em style="font-style:italic;color:var(--accent)">mode</em></div>
+          <div class="section-heading">Usage by <em>mode</em></div>
           <div class="usage-rows">
             <div class="usage-row">
               <div class="usage-row-label">Copy</div>
@@ -961,11 +976,11 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
     <button class="modal-close-btn" onclick="closeStripe()">✕</button>
     <div class="modal-eyebrow" id="modal-eyebrow">One-time purchase</div>
     <div class="modal-title" id="modal-title">Purchase <em>Pro</em></div>
-    <div class="stripe-badge">🔒 Secured by Stripe · No subscription · Cancel anytime</div>
+    <div class="stripe-badge">🔒 Secured by Stripe · No subscription</div>
     <div class="stripe-form-fields">
       <div class="form-group">
         <label class="label">Name on card</label>
-        <input id="c-name" class="input" type="text" placeholder="Alex Johnson" value="Alex Johnson">
+        <input id="c-name" class="input" type="text" placeholder="Your name">
       </div>
       <div class="form-group">
         <label class="label">Card number</label>
@@ -984,7 +999,7 @@ select.input { cursor: pointer; appearance: none; background-image: url("data:im
       <button class="btn btn-dark btn-full" id="pay-btn" onclick="pay()">
         Pay <span id="pay-amt">$29</span>
       </button>
-      <div class="modal-note">Demo — no real charges. Production: integrate <a href="https://stripe.com/docs" target="_blank">Stripe.js</a>.</div>
+      <div class="modal-note">Demo mode — no real charges. Production: integrate <a href="https://stripe.com/docs" target="_blank">Stripe.js</a>.</div>
     </div>
   </div>
 </div>
@@ -1040,16 +1055,20 @@ function handleSignup() {
   err.classList.remove('show');
   enter(em, nm, true);
 }
-function demoLogin() { enter('demo@zed.ai', 'Demo'); }
+function demoLogin() { enter('demo@caz.ai', 'Demo'); }
 function enter(email, name, isNew) {
   S.user = { email, name: name || email.split('@')[0] };
   S.credits = 50; S.totalCredits = 50;
   syncCreditsUI();
-  document.getElementById('hdr-user').textContent = S.user.name;
+  document.getElementById('hdr-user').textContent = S.user.name.toUpperCase();
   showScreen('dashboard');
-  toast(isNew ? `Welcome — 50 free credits added` : `Welcome back, ${S.user.name}`, 'ok');
+  toast(isNew ? 'Welcome — 50 free credits added' : `Welcome back, ${S.user.name}`, 'ok');
 }
-function logout() { Object.assign(S, { user: null, gens: 0, words: 0, used: 0, history: [], modeCount: { copy:0, code:0, story:0 } }); showScreen('landing'); toast('Signed out', 'ok'); }
+function logout() {
+  Object.assign(S, { user: null, gens: 0, words: 0, used: 0, history: [], modeCount: { copy:0, code:0, story:0 } });
+  showScreen('landing');
+  toast('Signed out', 'ok');
+}
 
 /* ─── GENERATION ─── */
 const COST = 5;
@@ -1075,7 +1094,7 @@ async function generate() {
   if (S.credits < COST) { toast('Not enough credits', 'bad'); switchTab('pricing'); return; }
   S.lastPrompt = prompt; S.lastTone = tone;
   beginLoad();
-try {
+  try {
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1088,10 +1107,11 @@ try {
     endGen(fallback(prompt, S.mode), prompt);
   }
 }
+
 function fallback(prompt, mode) {
   const f = {
     copy: `There is a quiet power in restraint.\n\nThe tools that last are never the ones that shout the loudest. They are the ones that disappear into your workflow — present, useful, invisible.\n\nCAZ was built for that. A single interface. Three modes. Unlimited possibility.\n\nWrite the brief you've been putting off. Ship the copy that's been sitting in a draft. Tell the story only you can tell.\n\nYour words, amplified.`,
-    code: `// Clean implementation for your request\n\nconst generate = async (prompt, options = {}) => {\n  const { mode = 'copy', tone = 'professional' } = options;\n\n  const response = await fetch('/api/generate', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({ prompt, mode, tone })\n  });\n\n  if (!response.ok) {\n    throw new Error(\`Generation failed: \${response.status}\`);\n  }\n\n  const { result, creditsUsed } = await response.json();\n  return { result, creditsUsed };\n};\n\n// Usage\nconst { result } = await generate(\n  '${prompt.slice(0,36)}',\n  { mode: '${mode}', tone: 'refined' }\n);\n\n// Always handle errors in production\nconsole.log(result);`,
+    code: `// Clean implementation for your request\n\nconst generate = async (prompt, options = {}) => {\n  const { mode = 'copy', tone = 'professional' } = options;\n\n  const response = await fetch('/api/generate', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({ prompt, mode, tone })\n  });\n\n  if (!response.ok) {\n    throw new Error(\`Generation failed: \${response.status}\`);\n  }\n\n  const { result, creditsUsed } = await response.json();\n  return { result, creditsUsed };\n};\n\n// Usage\nconst { result } = await generate(\n  '${prompt.slice(0,36)}',\n  { mode: '${mode}', tone: 'refined' }\n);\n\nconsole.log(result);`,
     story: `She found the letter on a Tuesday in March, tucked between a power bill and a menu for a Thai restaurant she had never visited.\n\nThe envelope was cream-coloured, heavy stock, addressed in a hand she almost recognized.\n\nShe set it on the counter and made coffee first. There was wisdom, she had learned, in giving time its due before opening the things that might rearrange everything.\n\nThe coffee was too hot. She let it cool.\n\nOutside, the street was doing what streets do in the early part of spring — half-heartedly waking, as if unconvinced that winter had really released its claim.\n\nShe picked up the letter.\n\nShe opened it.`
   };
   return f[mode] || f.copy;
@@ -1138,7 +1158,12 @@ function endGen(text, prompt) {
     }
   }, spd);
 
-  S.history.unshift({ prompt: prompt.slice(0, 90), mode: S.mode, output: text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), words: wc });
+  S.history.unshift({
+    prompt: prompt.slice(0, 90),
+    mode: S.mode, output: text,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    words: wc
+  });
   toast(`Generated — ${COST} credits used`, 'ok');
 }
 
@@ -1150,7 +1175,8 @@ function clearOut() {
   document.getElementById('out-mode-badge').textContent = '';
 }
 function copyOut() {
-  navigator.clipboard.writeText(document.getElementById('out-text').textContent).then(() => toast('Copied to clipboard', 'ok'));
+  navigator.clipboard.writeText(document.getElementById('out-text').textContent)
+    .then(() => toast('Copied to clipboard', 'ok'));
 }
 
 function syncCreditsUI() {
@@ -1163,7 +1189,7 @@ function syncCreditsUI() {
 function renderHistory() {
   const el = document.getElementById('history-rows');
   if (!S.history.length) {
-    el.innerHTML = `<div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);padding:32px 0;text-align:center">No generations yet</div>`;
+    el.innerHTML = `<div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);padding:40px 0;text-align:center">No generations yet</div>`;
     return;
   }
   el.innerHTML = S.history.map(h => `
@@ -1175,6 +1201,7 @@ function renderHistory() {
     </div>
   `).join('');
 }
+
 function loadHistory(el) {
   document.getElementById('gen-prompt').value = decodeURIComponent(el.dataset.prompt);
   const ot = document.getElementById('out-text');
@@ -1202,7 +1229,7 @@ function refreshOverview() {
 /* ─── STRIPE ─── */
 function openStripe(plan, amt, credits) {
   S._stripeCredits = credits; S._stripeAmt = amt;
-  document.getElementById('modal-eyebrow').textContent = `One-time purchase · ${credits.toLocaleString()} credits`;
+  document.getElementById('modal-eyebrow').textContent = `One-time · ${Number(credits).toLocaleString()} credits`;
   document.getElementById('modal-title').innerHTML = `Purchase <em>${plan}</em>`;
   document.getElementById('pay-amt').textContent = amt;
   document.getElementById('stripe-modal').classList.add('show');
@@ -1217,16 +1244,19 @@ async function pay() {
   const num = document.getElementById('c-num').value.replace(/\s/g,'');
   const exp = document.getElementById('c-exp').value;
   const cvc = document.getElementById('c-cvc').value.trim();
-  if (!name || num.length < 16 || !exp.includes('/') || cvc.length < 3) { toast('Please fill in all card details', 'bad'); return; }
+  if (!name || num.length < 16 || !exp.includes('/') || cvc.length < 3) {
+    toast('Please fill in all card details', 'bad'); return;
+  }
   const btn = document.getElementById('pay-btn');
   btn.disabled = true; btn.textContent = 'Processing…';
   await new Promise(r => setTimeout(r, 2000));
   S.credits += S._stripeCredits;
   S.totalCredits += S._stripeCredits;
   syncCreditsUI();
-  btn.disabled = false; btn.innerHTML = `Pay <span id="pay-amt">${S._stripeAmt}</span>`;
+  btn.disabled = false;
+  btn.innerHTML = `Pay <span id="pay-amt">${S._stripeAmt}</span>`;
   closeStripe();
-  toast(`${S._stripeCredits.toLocaleString()} credits added`, 'ok');
+  toast(`${Number(S._stripeCredits).toLocaleString()} credits added`, 'ok');
 }
 
 /* ─── TOAST ─── */
@@ -1239,7 +1269,9 @@ function toast(msg, type) {
   _tt = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
-document.getElementById('stripe-modal').addEventListener('click', e => { if (e.target.id === 'stripe-modal') closeStripe(); });
+document.getElementById('stripe-modal').addEventListener('click', e => {
+  if (e.target.id === 'stripe-modal') closeStripe();
+});
 </script>
 </body>
 </html>
