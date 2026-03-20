@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAZ — AI Writing Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F4F2F0;
+  --warm-white: #F9F8F7;
+  --paper: #EDEAE6;
+  --sand: #E2DDD8;
+  --stone: #BDB8B2;
+  --taupe: #928D88;
+  --ash: #625E5A;
+  --charcoal: #343130;
+  --ink: #1A1918;
+  --accent: #7C6E82;
+  --accent-light: rgba(124,110,130,0.11);
+  --accent-lighter: rgba(124,110,130,0.055);
+  --border: rgba(50,45,42,0.09);
+  --border-mid: rgba(50,45,42,0.16);
+  --success: #4E7260;
+  --error: #7A4848;
+  --serif: 'Libre Baskerville', Georgia, serif;
+  --mono: 'Geist Mono', 'Courier New', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  background: var(--warm-white);
+  color: var(--ink);
+  font-family: var(--serif);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRAIN ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.028'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 1;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── HEADER ── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(250,248,244,0.92);
+  backdrop-filter: blur(16px);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo {
+  font-family: var(--mono);
+  font-size: 13px; font-weight: 400;
+  letter-spacing: 0.22em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.logo em { color: var(--accent); font-style: normal; }
+
+.nav-row { display: flex; align-items: center; gap: 32px; }
+.nav-link {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--taupe); cursor: pointer;
+  transition: color 0.2s;
+  background: none; border: none;
+}
+.nav-link:hover { color: var(--ink); }
+
+/* ── BUTTONS ── */
+.btn {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  cursor: pointer; border: none;
+  padding: 11px 28px; border-radius: 2px;
+  transition: all 0.22s;
+}
+.btn-dark {
+  background: var(--ink); color: var(--warm-white);
+}
+.btn-dark:hover { background: var(--charcoal); }
+.btn-outline {
+  background: transparent; color: var(--ash);
+  border: 1px solid var(--border-mid);
+}
+.btn-outline:hover { border-color: var(--ash); color: var(--ink); }
+.btn-accent {
+  background: var(--accent); color: var(--warm-white);
+}
+.btn-accent:hover { background: var(--charcoal); }
+.btn-ghost {
+  background: transparent; color: var(--taupe);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { color: var(--ink); border-color: var(--border-mid); }
+.btn-full { width: 100%; }
+.btn-sm { padding: 8px 18px; font-size: 10px; }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── INPUTS ── */
+.input {
+  width: 100%;
+  background: var(--warm-white);
+  border: 1px solid var(--border-mid);
+  border-radius: 2px;
+  padding: 12px 16px;
+  font-family: var(--mono); font-size: 12px;
+  color: var(--ink); letter-spacing: 0.02em;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--stone); }
+.textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
+select.input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239B9088'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+.label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--taupe); display: block; margin-bottom: 8px;
+}
+.form-group { display: flex; flex-direction: column; }
+
+/* ── DIVIDER ── */
+.divider {
+  display: flex; align-items: center; gap: 16px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; color: var(--stone); text-transform: uppercase;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ─────────────────────────────────────
+   LANDING
+───────────────────────────────────── */
+#screen-landing { background: var(--cream); }
+
+.landing-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 24px 60px;
+  text-align: center;
+}
+
+.lede {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--taupe); margin-bottom: 28px;
+  animation: rise 0.7s 0.05s both;
+}
+
+.hero-title {
+  font-size: clamp(68px, 11vw, 136px);
+  font-weight: 300;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: 32px;
+  animation: rise 0.7s 0.12s both;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 18px; font-weight: 300;
+  color: var(--taupe); line-height: 1.65;
+  max-width: 440px; margin: 0 auto 52px;
+  letter-spacing: 0.01em;
+  animation: rise 0.7s 0.2s both;
+}
+
+.hero-ctas {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 80px;
+  animation: rise 0.7s 0.28s both;
+}
+
+.feature-row {
+  display: flex; gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  animation: rise 0.7s 0.36s both;
+}
+.feature-cell {
+  padding: 20px 32px; flex: 1;
+  border-right: 1px solid var(--border);
+  text-align: left;
+}
+.feature-cell:last-child { border-right: none; }
+.feature-cell-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--stone); margin-bottom: 6px;
+}
+.feature-cell-val {
+  font-size: 16px; font-weight: 400; color: var(--charcoal);
+}
+
+.landing-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; color: var(--stone);
+  text-transform: uppercase;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─────────────────────────────────────
+   AUTH
+───────────────────────────────────── */
+#screen-login, #screen-signup {
+  background: var(--cream);
+  align-items: center; justify-content: center;
+}
+
+.auth-container {
+  width: 100%; max-width: 400px;
+  padding: 20px;
+  animation: rise 0.5s both;
+}
+
+.auth-eyebrow {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--stone); text-align: center; margin-bottom: 12px;
+}
+.auth-title {
+  font-size: 44px; font-weight: 300;
+  letter-spacing: -0.02em; text-align: center;
+  margin-bottom: 40px; color: var(--ink);
+  line-height: 1;
+}
+.auth-title em { font-style: italic; color: var(--accent); }
+
+.auth-card {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 36px 32px;
+}
+
+.auth-fields { display: flex; flex-direction: column; gap: 20px; }
+
+.err-msg {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--error);
+  background: rgba(139,74,74,0.07);
+  border: 1px solid rgba(139,74,74,0.2);
+  padding: 10px 14px; border-radius: 2px;
+  display: none;
+}
+.err-msg.show { display: block; }
+
+.auth-footer {
+  text-align: center;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--stone); margin-top: 20px;
+}
+.auth-footer a { color: var(--accent); cursor: pointer; }
+.auth-footer a:hover { text-decoration: underline; }
+
+/* ─────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────── */
+#screen-dashboard { background: var(--warm-white); }
+
+.dash-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  flex: 1;
+}
+@media (max-width: 768px) {
+  .dash-body { grid-template-columns: 1fr; }
+  .dash-sidebar { display: none; }
+}
+
+/* SIDEBAR */
+.dash-sidebar {
+  background: var(--cream);
+  border-right: 1px solid var(--border);
+  padding: 32px 20px;
+  display: flex; flex-direction: column;
+  position: sticky; top: 64px;
+  height: calc(100vh - 64px);
+}
+
+.sidebar-section-label {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--stone); padding: 0 12px 10px;
+}
+
+.s-nav {
+  background: none; border: none;
+  width: 100%; text-align: left;
+  padding: 10px 14px; border-radius: 2px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--taupe); cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.s-nav:hover { background: var(--sand); color: var(--ink); }
+.s-nav.active { background: var(--ink); color: var(--warm-white); }
+
+.sidebar-credit-block {
+  margin-top: auto;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 20px;
+  background: var(--warm-white);
+}
+.scb-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 6px; }
+.scb-num { font-size: 40px; font-weight: 300; color: var(--ink); line-height: 1; margin-bottom: 2px; letter-spacing: -0.02em; }
+.scb-sub { font-family: var(--mono); font-size: 10px; color: var(--stone); margin-bottom: 16px; }
+
+/* MAIN */
+.dash-main { padding: 44px 52px; overflow-y: auto; }
+@media (max-width: 700px) { .dash-main { padding: 24px 20px; } }
+
+.tab-panel { display: none; animation: rise 0.35s both; }
+.tab-panel.active { display: block; }
+
+.page-title { font-size: 40px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 4px; }
+.page-title em { font-style: italic; color: var(--accent); }
+.page-sub { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--stone); text-transform: uppercase; margin-bottom: 40px; }
+
+/* CREDITS BADGE */
+.credits-pill {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.1em; color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid rgba(139,111,78,0.2);
+  padding: 5px 14px; border-radius: 20px;
+}
+
+/* ── STUDIO ── */
+.studio-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+}
+@media (max-width: 960px) { .studio-grid { grid-template-columns: 1fr; } }
+
+.studio-col { display: flex; flex-direction: column; gap: 20px; }
+
+.mode-tabs {
+  display: flex; border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+}
+.mode-tab {
+  flex: 1; padding: 9px 0;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--taupe); cursor: pointer; border: none;
+  background: var(--warm-white);
+  border-right: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.mode-tab:last-child { border-right: none; }
+.mode-tab.active { background: var(--ink); color: var(--warm-white); }
+.mode-tab:hover:not(.active) { background: var(--cream); color: var(--ink); }
+
+.cost-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cost-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--stone); }
+
+.output-box {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  min-height: 300px;
+  padding: 24px;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+
+.output-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+}
+.output-empty-mark { font-size: 32px; opacity: 0.18; letter-spacing: -0.05em; font-weight: 300; }
+.output-empty-txt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone); }
+
+.output-text {
+  font-size: 15px; font-weight: 300;
+  line-height: 1.75; color: var(--charcoal);
+  white-space: pre-wrap; word-break: break-word;
+  display: none; flex: 1;
+  font-family: var(--serif);
+}
+.output-text.show { display: block; }
+.output-text.typing::after { content: '|'; opacity: 1; animation: blink-cur 0.75s step-end infinite; color: var(--accent); }
+@keyframes blink-cur { 50% { opacity: 0; } }
+
+.output-footer {
+  display: none;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.output-footer.show { display: flex; }
+
+.output-tag {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px;
+  color: var(--taupe);
+  background: var(--sand);
+  border: 1px solid var(--border);
+  margin-left: auto;
+  align-self: center;
+}
+
+/* GENERATING OVERLAY */
+.gen-overlay {
+  position: absolute; inset: 0;
+  background: rgba(240,235,225,0.96);
+  backdrop-filter: blur(3px);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px;
+}
+.gen-overlay.show { display: flex; }
+
+.gen-line {
+  width: 120px; height: 1px;
+  background: var(--sand);
+  position: relative; overflow: hidden;
+}
+.gen-line::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: slide-line 1.4s ease-in-out infinite;
+}
+@keyframes slide-line { to { left: 200%; } }
+
+.gen-status { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--taupe); }
+
+/* ── STATS ── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+@media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
+
+.stat-tile {
+  border: 1px solid var(--border);
+  border-radius: 2px; padding: 22px 20px;
+  background: var(--warm-white);
+}
+.stat-tile-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); margin-bottom: 10px; }
+.stat-tile-val { font-size: 38px; font-weight: 300; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
+.stat-tile-note { font-family: var(--mono); font-size: 10px; color: var(--success); margin-top: 6px; letter-spacing: 0.06em; }
+
+.usage-section {
+  border: 1px solid var(--border); border-radius: 2px;
+  padding: 28px 28px; background: var(--warm-white);
+}
+.section-heading { font-size: 22px; font-weight: 300; letter-spacing: -0.01em; margin-bottom: 20px; }
+.usage-rows { display: flex; flex-direction: column; gap: 16px; }
+.usage-row { display: flex; align-items: center; gap: 16px; }
+.usage-row-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--taupe); width: 60px; flex-shrink: 0; }
+.usage-track { flex: 1; height: 2px; background: var(--sand); border-radius: 1px; overflow: hidden; }
+.usage-fill { height: 100%; border-radius: 1px; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+.usage-count { font-family: var(--mono); font-size: 11px; color: var(--stone); width: 24px; text-align: right; flex-shrink: 0; }
+
+/* ── HISTORY ── */
+.history-rows { display: flex; flex-direction: column; }
+.history-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.history-row:first-child { border-top: 1px solid var(--border); }
+.history-row:hover { background: var(--accent-lighter); margin: 0 -8px; padding-left: 8px; padding-right: 8px; }
+.h-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.h-dot.copy { background: var(--accent); }
+.h-dot.code { background: var(--success); }
+.h-dot.story { background: var(--ash); }
+.h-prompt { flex: 1; font-size: 15px; font-weight: 300; color: var(--charcoal); }
+.h-meta { font-family: var(--mono); font-size: 10px; color: var(--stone); letter-spacing: 0.06em; white-space: nowrap; }
+.h-mode { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--taupe); width: 40px; text-align: right; flex-shrink: 0; }
+
+/* ── PRICING ── */
+.pricing-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 900px) { .pricing-row { grid-template-columns: 1fr; max-width: 380px; } }
+
+.plan {
+  border: 1px solid var(--border); border-radius: 3px;
+  padding: 32px 28px; background: var(--warm-white);
+  display: flex; flex-direction: column; gap: 24px;
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative;
+}
+.plan:hover { border-color: var(--stone); transform: translateY(-2px); }
+.plan.featured { border-color: var(--accent); background: var(--cream); }
+
+.plan-badge-tag {
+  position: absolute; top: -1px; right: 24px;
+  background: var(--accent); color: var(--warm-white);
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 0 0 3px 3px;
+}
+
+.plan-name-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); }
+.plan-amt { font-size: 52px; font-weight: 300; letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
+.plan-period { font-family: var(--mono); font-size: 10px; color: var(--stone); letter-spacing: 0.1em; margin-top: 4px; }
+.plan-credit-note { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.08em; }
+.plan-feats { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.plan-feat { font-size: 14px; font-weight: 300; color: var(--ash); display: flex; align-items: center; gap: 10px; }
+.plan-feat::before { content: '—'; color: var(--stone); font-weight: 300; }
+
+/* ── STRIPE MODAL ── */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(28,26,24,0.55);
+  backdrop-filter: blur(6px);
+  z-index: 500;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-bg.show { display: flex; }
+.modal-box {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 44px 40px;
+  width: 100%; max-width: 440px;
+  position: relative;
+  animation: rise 0.3s both;
+}
+.modal-close-btn {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--cream); border: 1px solid var(--border);
+  color: var(--taupe); width: 30px; height: 30px;
+  border-radius: 2px; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.modal-close-btn:hover { color: var(--ink); border-color: var(--stone); }
+
+.modal-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px; }
+.modal-title { font-size: 30px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 28px; }
+.modal-title em { font-style: italic; color: var(--accent); }
+
+.stripe-badge { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--taupe); margin-bottom: 24px; border: 1px solid var(--border); padding: 8px 14px; border-radius: 2px; }
+.stripe-form-fields { display: flex; flex-direction: column; gap: 16px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--stone); text-align: center; margin-top: 10px; }
+.modal-note a { color: var(--accent); }
+
+/* ── TOAST ── */
+.toast-wrap {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+  z-index: 9000;
+  background: var(--ink); color: var(--warm-white);
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 13px 28px; border-radius: 2px;
+  opacity: 0; transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  white-space: nowrap;
+}
+.toast-wrap.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-wrap.ok { background: var(--ink); }
+.toast-wrap.bad { background: var(--error); }
+
+/* ── HEADER EXTRAS ── */
+.header-credits {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--taupe);
+}
+.header-credits strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════
+     LANDING
+══════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <header class="header">
+    <div class="logo">C<em>A</em>Z</div>
+    <nav class="nav-row">
+      <button class="nav-link" onclick="showScreen('login')">Sign in</button>
+      <button class="btn btn-dark btn-sm" onclick="showScreen('signup')">Get started</button>
+    </nav>
+  </header>
+
+  <div class="landing-wrap">
+    <div class="lede">AI Writing Studio</div>
+
+    <h1 class="hero-title">
+      Think it.<br><em>Write</em> it.
+    </h1>
+
+    <p class="hero-sub">
+      CAZ turns your raw ideas into polished copy, code, and stories — quietly, precisely, in seconds.
+    </p>
+
+    <div class="hero-ctas">
+      <button class="btn btn-dark" onclick="showScreen('signup')">Start for free</button>
+      <button class="btn btn-outline" onclick="demoLogin()">View demo</button>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-cell">
+        <div class="feature-cell-label">Model</div>
+        <div class="feature-cell-val">Claude AI</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-cell-label">Free credits</div>
+        <div class="feature-cell-val">50 on sign-up</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-cell-label">Modes</div>
+        <div class="feature-cell-val">Copy · Code · Story</div>
+      </div>
+      <div class="feature-cell" style="border-right:none">
+        <div class="feature-cell-label">Billing</div>
+        <div class="feature-cell-val">Pay as you go</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="landing-footer">
+    <span>© 2026 Caz Studio</span>
+    <span>Powered by Anthropic Claude</span>
+    <span>All rights reserved</span>
+  </footer>
+</div>
+
+<!-- ══════════════════════
+     LOGIN
+══════════════════════ -->
+<div id="screen-login" class="screen">
+  <header class="header">
+    <div class="logo" style="cursor:pointer" onclick="showScreen('landing')">C<em style="color:var(--accent);font-style:normal">A</em>Z</div>
+  </header>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:var(--cream)">
+    <div class="auth-container">
+      <div class="auth-eyebrow">Welcome back</div>
+      <h2 class="auth-title">Sign <em>in</em></h2>
+      <div class="auth-card">
+        <div class="auth-fields">
+          <div id="login-err" class="err-msg"></div>
+          <div class="form-group">
+            <label class="label">Email</label>
+            <input id="l-email" class="input" type="email" placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label class="label">Password</label>
+            <input id="l-pass" class="input" type="password" placeholder="••••••••">
+          </div>
+          <button class="btn btn-dark btn-full" onclick="handleLogin()">Sign in</button>
+          <div class="divider">or</div>
+          <button class="btn btn-outline btn-full" onclick="demoLogin()">Continue with demo</button>
+        </div>
+        <div class="auth-footer">No account? <a onclick="showScreen('signup')">Sign up free</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     SIGNUP
+══════════════════════ -->
+<div id="screen-signup" class="screen">
+  <header class="header">
+    <div class="logo" style="cursor:pointer" onclick="showScreen('landing')">C<em style="color:var(--accent);font-style:normal">A</em>Z</div>
+  </header>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:var(--cream)">
+    <div class="auth-container">
+      <div class="auth-eyebrow">50 free credits on sign-up</div>
+      <h2 class="auth-title">Create <em>account</em></h2>
+      <div class="auth-card">
+        <div class="auth-fields">
+          <div id="su-err" class="err-msg"></div>
+          <div class="form-group">
+            <label class="label">Name</label>
+            <input id="su-name" class="input" type="text" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="label">Email</label>
+            <input id="su-email" class="input" type="email" placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label class="label">Password</label>
+            <input id="su-pass" class="input" type="password" placeholder="Min 8 characters">
+          </div>
+          <button class="btn btn-dark btn-full" onclick="handleSignup()">Create account</button>
+          <div class="divider">or</div>
+          <button class="btn btn-outline btn-full" onclick="demoLogin()">Try demo</button>
+        </div>
+        <div class="auth-footer">Have an account? <a onclick="showScreen('login')">Sign in</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     DASHBOARD
+══════════════════════ -->
+<div id="screen-dashboard" class="screen">
+  <header class="header">
+    <div class="logo">C<em style="color:var(--accent);font-style:normal">A</em>Z</div>
+    <div style="display:flex;align-items:center;gap:24px">
+      <div class="header-credits"><strong id="hdr-credits">50</strong> credits</div>
+      <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--stone);text-transform:uppercase" id="hdr-user">user</span>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Sign out</button>
+    </div>
+  </header>
+
+  <div class="dash-body">
+    <!-- SIDEBAR -->
+    <aside class="dash-sidebar">
+      <div class="sidebar-section-label" style="margin-bottom:8px">Studio</div>
+      <button class="s-nav active" id="snav-studio" onclick="switchTab('studio')">
+        <span>◇</span> Studio
+      </button>
+      <button class="s-nav" id="snav-history" onclick="switchTab('history')">
+        <span>○</span> History
+      </button>
+      <div class="sidebar-section-label" style="margin-top:20px;margin-bottom:8px">Account</div>
+      <button class="s-nav" id="snav-pricing" onclick="switchTab('pricing')">
+        <span>◈</span> Buy Credits
+      </button>
+      <button class="s-nav" id="snav-overview" onclick="switchTab('overview')">
+        <span>▦</span> Overview
+      </button>
+
+      <div class="sidebar-credit-block">
+        <div class="scb-label">Credits</div>
+        <div class="scb-num" id="sb-credits">50</div>
+        <div class="scb-sub">≈ <span id="sb-gens">10</span> generations left</div>
+        <button class="btn btn-accent btn-full btn-sm" onclick="switchTab('pricing')">Add credits</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dash-main">
+
+      <!-- STUDIO -->
+      <div class="tab-panel active" id="tab-studio">
+        <div class="page-title">AI <em>Studio</em></div>
+        <div class="page-sub">Generate copy, code & stories</div>
+
+        <div class="studio-grid">
+          <!-- INPUT -->
+          <div class="studio-col">
+            <div class="form-group">
+              <label class="label">Mode</label>
+              <div class="mode-tabs">
+                <button class="mode-tab active" onclick="setMode(this,'copy')">Copy</button>
+                <button class="mode-tab" onclick="setMode(this,'code')">Code</button>
+                <button class="mode-tab" onclick="setMode(this,'story')">Story</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="label">Prompt</label>
+              <textarea id="gen-prompt" class="input textarea" placeholder="Describe what you want to create…&#10;&#10;e.g. Write a product description for a minimal AI writing tool aimed at professionals"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="label">Tone</label>
+              <select id="gen-tone" class="input">
+                <option>Professional & authoritative</option>
+                <option>Warm & conversational</option>
+                <option>Luxury & refined</option>
+                <option>Technical & precise</option>
+                <option>Bold & confident</option>
+              </select>
+            </div>
+
+            <div class="cost-row">
+              <span class="cost-label">Cost: 5 credits per generation</span>
+              <button class="btn btn-dark" id="gen-btn" onclick="generate()">Generate →</button>
+            </div>
+          </div>
+
+          <!-- OUTPUT -->
+          <div class="studio-col">
+            <label class="label">Output <span id="out-mode-badge" style="color:var(--accent)"></span></label>
+            <div class="output-box" style="flex:1">
+              <div class="output-empty" id="out-empty">
+                <div class="output-empty-mark">CAZ</div>
+                <div class="output-empty-txt">Awaiting generation</div>
+              </div>
+              <div class="output-text" id="out-text"></div>
+              <div class="gen-overlay" id="gen-overlay">
+                <div class="gen-line"></div>
+                <div class="gen-status" id="gen-status">Generating</div>
+              </div>
+              <div class="output-footer" id="out-footer">
+                <button class="btn btn-ghost btn-sm" onclick="copyOut()">Copy</button>
+                <button class="btn btn-ghost btn-sm" onclick="regenOut()">Regenerate</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearOut()">Clear</button>
+                <span class="output-tag" id="out-tag">copy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="tab-panel" id="tab-history">
+        <div class="page-title"><em>History</em></div>
+        <div class="page-sub">Your past generations</div>
+        <div class="history-rows" id="history-rows">
+          <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);padding:32px 0;text-align:center">
+            No generations yet
+          </div>
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="tab-panel" id="tab-pricing">
+        <div class="page-title">Add <em>Credits</em></div>
+        <div class="page-sub">One-time purchases, no subscription</div>
+        <div class="pricing-row">
+          <div class="plan">
+            <div>
+              <div class="plan-name-label">Starter</div>
+              <div class="plan-amt">$9</div>
+              <div class="plan-period">One-time · 100 credits</div>
+            </div>
+            <div class="plan-credit-note">≈ 20 generations</div>
+            <div class="plan-feats">
+              <div class="plan-feat">All generation modes</div>
+              <div class="plan-feat">Export outputs</div>
+              <div class="plan-feat">Generation history</div>
+            </div>
+            <button class="btn btn-outline btn-full" onclick="openStripe('Starter','$9',100)">Purchase</button>
+          </div>
+
+          <div class="plan featured">
+            <div class="plan-badge-tag">Popular</div>
+            <div>
+              <div class="plan-name-label">Pro</div>
+              <div class="plan-amt">$29</div>
+              <div class="plan-period">One-time · 400 credits</div>
+            </div>
+            <div class="plan-credit-note">≈ 80 generations</div>
+            <div class="plan-feats">
+              <div class="plan-feat">All generation modes</div>
+              <div class="plan-feat">Priority generation</div>
+              <div class="plan-feat">Advanced tones</div>
+              <div class="plan-feat">Full history & export</div>
+            </div>
+            <button class="btn btn-dark btn-full" onclick="openStripe('Pro','$29',400)">Purchase</button>
+          </div>
+
+          <div class="plan">
+            <div>
+              <div class="plan-name-label">Studio</div>
+              <div class="plan-amt">$79</div>
+              <div class="plan-period">One-time · 1,500 credits</div>
+            </div>
+            <div class="plan-credit-note">≈ 300 generations</div>
+            <div class="plan-feats">
+              <div class="plan-feat">Everything in Pro</div>
+              <div class="plan-feat">Bulk generation</div>
+              <div class="plan-feat">API access</div>
+              <div class="plan-feat">Priority support</div>
+            </div>
+            <button class="btn btn-outline btn-full" onclick="openStripe('Studio','$79',1500)">Purchase</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="tab-panel" id="tab-overview">
+        <div class="page-title"><em>Overview</em></div>
+        <div class="page-sub">Your usage this session</div>
+        <div class="stat-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Credits left</div>
+            <div class="stat-tile-val" id="ov-credits">50</div>
+            <div class="stat-tile-note" id="ov-credits-sub">of 50 total</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Generations</div>
+            <div class="stat-tile-val" id="ov-gens">0</div>
+            <div class="stat-tile-note">this session</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Words created</div>
+            <div class="stat-tile-val" id="ov-words">0</div>
+            <div class="stat-tile-note">approx. count</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Credits used</div>
+            <div class="stat-tile-val" id="ov-used">0</div>
+            <div class="stat-tile-note">this session</div>
+          </div>
+        </div>
+
+        <div class="usage-section">
+          <div class="section-heading">Usage by <em style="font-style:italic;color:var(--accent)">mode</em></div>
+          <div class="usage-rows">
+            <div class="usage-row">
+              <div class="usage-row-label">Copy</div>
+              <div class="usage-track"><div class="usage-fill" id="uf-copy" style="width:0%;background:var(--accent)"></div></div>
+              <div class="usage-count" id="uc-copy">0</div>
+            </div>
+            <div class="usage-row">
+              <div class="usage-row-label">Code</div>
+              <div class="usage-track"><div class="usage-fill" id="uf-code" style="width:0%;background:var(--success)"></div></div>
+              <div class="usage-count" id="uc-code">0</div>
+            </div>
+            <div class="usage-row">
+              <div class="usage-row-label">Story</div>
+              <div class="usage-track"><div class="usage-fill" id="uf-story" style="width:0%;background:var(--ash)"></div></div>
+              <div class="usage-count" id="uc-story">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     STRIPE MODAL
+══════════════════════ -->
+<div class="modal-bg" id="stripe-modal">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeStripe()">✕</button>
+    <div class="modal-eyebrow" id="modal-eyebrow">One-time purchase</div>
+    <div class="modal-title" id="modal-title">Purchase <em>Pro</em></div>
+    <div class="stripe-badge">🔒 Secured by Stripe · No subscription · Cancel anytime</div>
+    <div class="stripe-form-fields">
+      <div class="form-group">
+        <label class="label">Name on card</label>
+        <input id="c-name" class="input" type="text" placeholder="Alex Johnson" value="Alex Johnson">
+      </div>
+      <div class="form-group">
+        <label class="label">Card number</label>
+        <input id="c-num" class="input" type="text" placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)">
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="label">Expiry</label>
+          <input id="c-exp" class="input" type="text" placeholder="MM / YY" maxlength="7" oninput="fmtExp(this)">
+        </div>
+        <div class="form-group">
+          <label class="label">CVC</label>
+          <input id="c-cvc" class="input" type="text" placeholder="123" maxlength="3">
+        </div>
+      </div>
+      <button class="btn btn-dark btn-full" id="pay-btn" onclick="pay()">
+        Pay <span id="pay-amt">$29</span>
+      </button>
+      <div class="modal-note">Demo — no real charges. Production: integrate <a href="https://stripe.com/docs" target="_blank">Stripe.js</a>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toast"></div>
+
+<script>
+/* ─── STATE ─── */
+const S = {
+  user: null, credits: 50, totalCredits: 50,
+  gens: 0, words: 0, used: 0,
+  modeCount: { copy: 0, code: 0, story: 0 },
+  mode: 'copy', history: [],
+  lastPrompt: '', lastTone: '',
+  _stripeCredits: 0, _stripeAmt: ''
+};
+
+/* ─── ROUTING ─── */
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function switchTab(n) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.s-nav').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + n).classList.add('active');
+  document.getElementById('snav-' + n).classList.add('active');
+  if (n === 'overview') refreshOverview();
+  if (n === 'history') renderHistory();
+}
+
+/* ─── AUTH ─── */
+function handleLogin() {
+  const e = document.getElementById('l-email').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const err = document.getElementById('login-err');
+  if (!e || !p) { err.textContent = 'Please fill in all fields.'; err.classList.add('show'); return; }
+  if (p.length < 4) { err.textContent = 'Invalid credentials.'; err.classList.add('show'); return; }
+  err.classList.remove('show');
+  enter(e);
+}
+function handleSignup() {
+  const nm = document.getElementById('su-name').value.trim();
+  const em = document.getElementById('su-email').value.trim();
+  const pw = document.getElementById('su-pass').value;
+  const err = document.getElementById('su-err');
+  if (!nm || !em || !pw) { err.textContent = 'Please fill in all fields.'; err.classList.add('show'); return; }
+  if (pw.length < 8) { err.textContent = 'Password must be at least 8 characters.'; err.classList.add('show'); return; }
+  if (!em.includes('@')) { err.textContent = 'Please enter a valid email.'; err.classList.add('show'); return; }
+  err.classList.remove('show');
+  enter(em, nm, true);
+}
+function demoLogin() { enter('demo@zed.ai', 'Demo'); }
+function enter(email, name, isNew) {
+  S.user = { email, name: name || email.split('@')[0] };
+  S.credits = 50; S.totalCredits = 50;
+  syncCreditsUI();
+  document.getElementById('hdr-user').textContent = S.user.name;
+  showScreen('dashboard');
+  toast(isNew ? `Welcome — 50 free credits added` : `Welcome back, ${S.user.name}`, 'ok');
+}
+function logout() { Object.assign(S, { user: null, gens: 0, words: 0, used: 0, history: [], modeCount: { copy:0, code:0, story:0 } }); showScreen('landing'); toast('Signed out', 'ok'); }
+
+/* ─── GENERATION ─── */
+const COST = 5;
+
+function setMode(btn, mode) {
+  document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  S.mode = mode;
+}
+
+const sys = {
+  copy: 'You are a world-class copywriter. Write compelling, precise marketing copy. Be clear, persuasive, and human. Short paragraphs. No markdown headers.',
+  code: 'You are an expert engineer. Write clean, readable, production-quality code with a brief explanation before the code block.',
+  story: 'You are a literary fiction writer. Write vivid, atmospheric narratives with strong imagery and voice.'
+};
+
+const phases = ['Connecting to Claude', 'Analyzing prompt', 'Generating tokens', 'Refining output', 'Finishing up'];
+
+async function generate() {
+  const prompt = document.getElementById('gen-prompt').value.trim();
+  const tone = document.getElementById('gen-tone').value;
+  if (!prompt) { toast('Please enter a prompt', 'bad'); return; }
+  if (S.credits < COST) { toast('Not enough credits', 'bad'); switchTab('pricing'); return; }
+  S.lastPrompt = prompt; S.lastTone = tone;
+  beginLoad();
+try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, mode: S.mode, tone })
+    });
+    if (!res.ok) throw new Error();
+    const d = await res.json();
+    endGen(d.result, prompt);
+  } catch {
+    endGen(fallback(prompt, S.mode), prompt);
+  }
+}
+function fallback(prompt, mode) {
+  const f = {
+    copy: `There is a quiet power in restraint.\n\nThe tools that last are never the ones that shout the loudest. They are the ones that disappear into your workflow — present, useful, invisible.\n\nCAZ was built for that. A single interface. Three modes. Unlimited possibility.\n\nWrite the brief you've been putting off. Ship the copy that's been sitting in a draft. Tell the story only you can tell.\n\nYour words, amplified.`,
+    code: `// Clean implementation for your request\n\nconst generate = async (prompt, options = {}) => {\n  const { mode = 'copy', tone = 'professional' } = options;\n\n  const response = await fetch('/api/generate', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({ prompt, mode, tone })\n  });\n\n  if (!response.ok) {\n    throw new Error(\`Generation failed: \${response.status}\`);\n  }\n\n  const { result, creditsUsed } = await response.json();\n  return { result, creditsUsed };\n};\n\n// Usage\nconst { result } = await generate(\n  '${prompt.slice(0,36)}',\n  { mode: '${mode}', tone: 'refined' }\n);\n\n// Always handle errors in production\nconsole.log(result);`,
+    story: `She found the letter on a Tuesday in March, tucked between a power bill and a menu for a Thai restaurant she had never visited.\n\nThe envelope was cream-coloured, heavy stock, addressed in a hand she almost recognized.\n\nShe set it on the counter and made coffee first. There was wisdom, she had learned, in giving time its due before opening the things that might rearrange everything.\n\nThe coffee was too hot. She let it cool.\n\nOutside, the street was doing what streets do in the early part of spring — half-heartedly waking, as if unconvinced that winter had really released its claim.\n\nShe picked up the letter.\n\nShe opened it.`
+  };
+  return f[mode] || f.copy;
+}
+
+let _phaseInt;
+function beginLoad() {
+  document.getElementById('gen-btn').disabled = true;
+  document.getElementById('out-empty').style.display = 'none';
+  document.getElementById('out-text').classList.remove('show');
+  document.getElementById('out-footer').classList.remove('show');
+  document.getElementById('gen-overlay').classList.add('show');
+  let i = 0;
+  _phaseInt = setInterval(() => {
+    document.getElementById('gen-status').textContent = phases[i++ % phases.length];
+  }, 700);
+}
+
+function endGen(text, prompt) {
+  clearInterval(_phaseInt);
+  document.getElementById('gen-overlay').classList.remove('show');
+  document.getElementById('gen-btn').disabled = false;
+
+  S.credits = Math.max(0, S.credits - COST);
+  S.used += COST; S.gens++;
+  const wc = text.split(/\s+/).length;
+  S.words += wc;
+  S.modeCount[S.mode]++;
+  syncCreditsUI();
+
+  const el = document.getElementById('out-text');
+  el.textContent = ''; el.classList.add('show', 'typing');
+  document.getElementById('out-tag').textContent = S.mode;
+  document.getElementById('out-mode-badge').textContent = `— ${S.mode}`;
+
+  let i = 0;
+  const spd = Math.max(6, Math.min(22, Math.floor(2800 / text.length)));
+  const iv = setInterval(() => {
+    if (i < text.length) { el.textContent += text[i++]; }
+    else {
+      clearInterval(iv);
+      el.classList.remove('typing');
+      document.getElementById('out-footer').classList.add('show');
+    }
+  }, spd);
+
+  S.history.unshift({ prompt: prompt.slice(0, 90), mode: S.mode, output: text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), words: wc });
+  toast(`Generated — ${COST} credits used`, 'ok');
+}
+
+function regenOut() { if (S.lastPrompt) { document.getElementById('gen-prompt').value = S.lastPrompt; generate(); } }
+function clearOut() {
+  document.getElementById('out-text').classList.remove('show');
+  document.getElementById('out-empty').style.display = 'flex';
+  document.getElementById('out-footer').classList.remove('show');
+  document.getElementById('out-mode-badge').textContent = '';
+}
+function copyOut() {
+  navigator.clipboard.writeText(document.getElementById('out-text').textContent).then(() => toast('Copied to clipboard', 'ok'));
+}
+
+function syncCreditsUI() {
+  document.getElementById('hdr-credits').textContent = S.credits;
+  document.getElementById('sb-credits').textContent = S.credits;
+  document.getElementById('sb-gens').textContent = Math.floor(S.credits / COST);
+}
+
+/* ─── HISTORY ─── */
+function renderHistory() {
+  const el = document.getElementById('history-rows');
+  if (!S.history.length) {
+    el.innerHTML = `<div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);padding:32px 0;text-align:center">No generations yet</div>`;
+    return;
+  }
+  el.innerHTML = S.history.map(h => `
+    <div class="history-row" onclick="loadHistory(this)" data-out="${encodeURIComponent(h.output)}" data-prompt="${encodeURIComponent(h.prompt)}">
+      <div class="h-dot ${h.mode}"></div>
+      <div class="h-prompt">${h.prompt}</div>
+      <div class="h-meta">${h.time} · ${h.words}w</div>
+      <div class="h-mode">${h.mode}</div>
+    </div>
+  `).join('');
+}
+function loadHistory(el) {
+  document.getElementById('gen-prompt').value = decodeURIComponent(el.dataset.prompt);
+  const ot = document.getElementById('out-text');
+  ot.textContent = decodeURIComponent(el.dataset.out);
+  ot.classList.add('show');
+  document.getElementById('out-empty').style.display = 'none';
+  document.getElementById('out-footer').classList.add('show');
+  switchTab('studio');
+}
+
+/* ─── OVERVIEW ─── */
+function refreshOverview() {
+  document.getElementById('ov-credits').textContent = S.credits;
+  document.getElementById('ov-credits-sub').textContent = `of ${S.totalCredits} total`;
+  document.getElementById('ov-gens').textContent = S.gens;
+  document.getElementById('ov-words').textContent = S.words.toLocaleString();
+  document.getElementById('ov-used').textContent = S.used;
+  const max = Math.max(...Object.values(S.modeCount), 1);
+  ['copy','code','story'].forEach(m => {
+    document.getElementById('uf-' + m).style.width = (S.modeCount[m] / max * 100) + '%';
+    document.getElementById('uc-' + m).textContent = S.modeCount[m];
+  });
+}
+
+/* ─── STRIPE ─── */
+function openStripe(plan, amt, credits) {
+  S._stripeCredits = credits; S._stripeAmt = amt;
+  document.getElementById('modal-eyebrow').textContent = `One-time purchase · ${credits.toLocaleString()} credits`;
+  document.getElementById('modal-title').innerHTML = `Purchase <em>${plan}</em>`;
+  document.getElementById('pay-amt').textContent = amt;
+  document.getElementById('stripe-modal').classList.add('show');
+}
+function closeStripe() { document.getElementById('stripe-modal').classList.remove('show'); }
+
+function fmtCard(el) { let v = el.value.replace(/\D/g,'').slice(0,16); el.value = v.replace(/(.{4})/g,'$1 ').trim(); }
+function fmtExp(el) { let v = el.value.replace(/\D/g,'').slice(0,4); if (v.length >= 2) v = v.slice(0,2)+' / '+v.slice(2); el.value = v; }
+
+async function pay() {
+  const name = document.getElementById('c-name').value.trim();
+  const num = document.getElementById('c-num').value.replace(/\s/g,'');
+  const exp = document.getElementById('c-exp').value;
+  const cvc = document.getElementById('c-cvc').value.trim();
+  if (!name || num.length < 16 || !exp.includes('/') || cvc.length < 3) { toast('Please fill in all card details', 'bad'); return; }
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true; btn.textContent = 'Processing…';
+  await new Promise(r => setTimeout(r, 2000));
+  S.credits += S._stripeCredits;
+  S.totalCredits += S._stripeCredits;
+  syncCreditsUI();
+  btn.disabled = false; btn.innerHTML = `Pay <span id="pay-amt">${S._stripeAmt}</span>`;
+  closeStripe();
+  toast(`${S._stripeCredits.toLocaleString()} credits added`, 'ok');
+}
+
+/* ─── TOAST ─── */
+let _tt;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast-wrap show ${type}`;
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+document.getElementById('stripe-modal').addEventListener('click', e => { if (e.target.id === 'stripe-modal') closeStripe(); });
+</script>
+</body>
+</html>
